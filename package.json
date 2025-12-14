@@ -1,0 +1,58 @@
+{
+  "name": "skir-internal",
+  "version": "0.0.1",
+  "description": "",
+  "homepage": "https://github.com/gepheum/skir-internal#readme",
+  "bugs": {
+    "url": "https://github.com/gepheum/skir-internal/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gepheum/skir-internal.git"
+  },
+  "license": "ISC",
+  "author": "Tyler Fibonacci <gepheum@gmail.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/*": {
+      "import": "./dist/*",
+      "require": "./dist/*"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "bin": "./dist/compiler.js",
+  "files": [
+    "dist",
+    "src",
+    "!**/*.test.ts"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "test": "mocha",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+  "dependencies": {
+    "zod": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "buckwheat": "^1.1.2",
+    "eslint": "^8.54.0",
+    "mocha": "^10.2.0",
+    "prettier": "^3.2.4",
+    "prettier-plugin-organize-imports": "^4.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.2.2"
+  }
+}
