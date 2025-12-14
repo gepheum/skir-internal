@@ -1,18 +1,4 @@
-import type { Casing, ErrorSink, Token } from "./types.js";
-
-/** Registers an error if the given token does not match the expected casing. */
-export function validate(
-  name: Token,
-  expected: "lower_underscore" | "UpperCamel" | "UPPER_UNDERSCORE",
-  errors: ErrorSink,
-): void {
-  if (!caseMatches(name.text, expected)) {
-    errors.push({
-      token: name,
-      expected: expected,
-    });
-  }
-}
+import type { Casing } from "./types.js";
 
 export function convertCase(text: string, target: Casing): string {
   let words: readonly string[];
@@ -36,18 +22,4 @@ export function convertCase(text: string, target: Casing): string {
 /** Returns a new string with the first letter of `name` capitalized. */
 export function capitalize(name: string): string {
   return name[0]!.toUpperCase() + name.slice(1);
-}
-
-export function caseMatches(
-  name: string,
-  expected: "lower_underscore" | "UpperCamel" | "UPPER_UNDERSCORE",
-): boolean {
-  switch (expected) {
-    case "lower_underscore":
-      return /^[a-z][0-9a-z]*(_[a-z][0-9a-z]*)*$/.test(name);
-    case "UpperCamel":
-      return /^[A-Z][0-9A-Za-z]*$/.test(name);
-    case "UPPER_UNDERSCORE":
-      return /^[A-Z][0-9A-Z]*(_[A-Z][0-9A-Z]*)*$/.test(name);
-  }
 }
