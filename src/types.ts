@@ -475,6 +475,9 @@ export type DenseJson = null | boolean | number | string | readonly DenseJson[];
  * Result of parsing the doc comments.
  */
 export interface Doc<Mutable extends boolean = boolean> {
+  /** The whole text including references. */
+  text: string;
+  /** The whole text split into pieces. */
   pieces: readonly DocPiece<Mutable>[];
 }
 
