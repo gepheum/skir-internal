@@ -2,7 +2,7 @@ import type { Casing } from "./types.js";
 
 export function convertCase(text: string, target: Casing): string {
   let words: readonly string[];
-  if (text.includes("_")) {
+  if (text.includes("_") || !/[a-z]/.test(text)) {
     words = text.split("_").map((w) => w.toLowerCase());
   } else {
     words = text.split(/(?=[A-Z])/).map((w) => w.toLowerCase());
