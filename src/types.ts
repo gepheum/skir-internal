@@ -13,7 +13,6 @@ import type { z } from "zod";
  */
 export interface CodeGenerator<Config = unknown> {
   readonly id: string;
-  readonly version: string;
   readonly configType: z.ZodType<Config>;
   generateCode(input: CodeGenerator.Input<Config>): CodeGenerator.Output;
 }
