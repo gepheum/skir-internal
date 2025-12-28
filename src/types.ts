@@ -19,7 +19,7 @@ export interface CodeGenerator<Config = unknown> {
 
 export declare namespace CodeGenerator {
   export interface Input<Config> {
-    readonly modules: ReadonlyArray<Module>;
+    readonly modules: readonly Module[];
     readonly recordMap: ReadonlyMap<RecordKey, RecordLocation>;
     readonly config: Config;
   }
@@ -154,23 +154,23 @@ export interface ResolvedRecordRef {
   readonly key: RecordKey;
   readonly recordType: "struct" | "enum";
 
-  readonly nameParts: ReadonlyArray<{
-    /**
-     * A single name in the type reference.
-     * Can refer to either a report or a module alias.
-     */
-    token: Token;
-    /**
-     * Either the definition of the record or the aliased import declaration.
-     */
-    declaration: Record | ImportAlias;
-  }>;
+  readonly nameParts: ReadonlyArray<ResolvedRecordRefName>;
 
   /**
    * Last token in the type reference. For example, if the type reference is
    * ".Foo.Bar", this is the token for "Bar".
    */
   readonly refToken: Token;
+}
+
+export interface ResolvedRecordRefName {
+  /**
+   * A single name in the type reference.
+   * Can refer to either a record or a module alias.
+   */
+  readonly token: Token;
+  /** Either the definition of the record or the aliased import declaration. */
+  readonly declaration: Record | ImportAlias;
 }
 
 export interface MutableFieldPathItem {
@@ -489,6 +489,8 @@ export type DocPiece<Mutable extends boolean = boolean> =
     }
   | DocReference<Mutable>;
 
+export type MutableDocPiece = DocPiece<true>;
+
 /** Reference to a field or variant within a record. */
 export interface RecordField<Mutable extends boolean = boolean> {
   readonly kind: "field";
@@ -498,12 +500,12 @@ export interface RecordField<Mutable extends boolean = boolean> {
 
 export type MutableRecordField = RecordField<true>;
 
-export interface MutableDocReference {
+export interface MutableDocReference<Mutable extends boolean = true> {
   readonly kind: "reference";
   readonly docComment: Token;
   readonly referenceRange: Token;
-  /** Chain of symbol names in the reference. Empty if there was an error. */
-  readonly nameChain: readonly Token[];
+  /** Empty if there was an error. */
+  readonly nameParts: ReadonlyArray<DocReferenceName<Mutable>>;
   /**
    * True if the reference starts with a dot.
    * Means that the first symbol is to be found at the top-level of the module.
@@ -516,7 +518,19 @@ export interface MutableDocReference {
 export type DocReference<Mutable extends boolean = boolean> = //
   Mutable extends true //
     ? MutableDocReference
-    : Readonly<MutableDocReference>;
+    : Readonly<MutableDocReference<boolean>>;
+
+export interface MutableDocReferenceName {
+  readonly token: Token;
+  /** What declaration the name refers to. */
+  declaration: Constant | Field | ImportAlias | Method | Record | undefined;
+}
+
+/** One single name found in a reference in a doc comment ( [...] ). */
+export type DocReferenceName<Mutable extends boolean = boolean> =
+  Mutable extends true
+    ? MutableDocReferenceName
+    : Readonly<MutableDocReferenceName>;
 
 /** A declaration which can appear at the top-level of a module. */
 export type ModuleLevelDeclaration<Mutable extends boolean = boolean> =
