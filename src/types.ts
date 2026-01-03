@@ -384,7 +384,6 @@ export interface MutableMethod<Mutable extends boolean = true> {
   // A hash of the name, or the explicit number specified after "=" if any.
   // In the uint32 range.
   readonly number: number;
-  readonly hasExplicitNumber: boolean;
   inlineRequestRecord: Record<Mutable> | undefined;
   inlineResponseRecord: Record<Mutable> | undefined;
 }
