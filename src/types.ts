@@ -411,6 +411,11 @@ export type Constant<Mutable extends boolean = boolean> = //
 export interface MutableObjectEntry<Mutable extends boolean = true> {
   readonly name: Token;
   readonly value: Value<Mutable>;
+  /**
+   * The field declaration in the struct definition.
+   * Undefined if the record is an enum.
+   */
+  fieldDeclaration?: Field;
 }
 
 export type ObjectEntry<Mutable extends boolean = boolean> = //
@@ -423,8 +428,8 @@ export interface MutableObjectValue<Mutable extends boolean = true> {
   readonly kind: "object";
   readonly token: Token;
   readonly entries: Readonly<{ [f: string]: ObjectEntry<Mutable> }>;
-  partial: boolean;
-  type?: RecordKey;
+  readonly partial: boolean;
+  record?: Record;
 }
 
 export type ObjectValue<Mutable extends boolean = boolean> = //
