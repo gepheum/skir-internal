@@ -82,6 +82,8 @@ export type SkirError =
       /** Convention: starts with a capital letter. */
       readonly message: string;
       readonly expected?: undefined;
+      /** If set, the compiler was expecting one of these names. */
+      readonly expectedNames?: readonly string[];
       readonly errorIsInOtherModule?: true;
     }
   | {
@@ -89,6 +91,7 @@ export type SkirError =
       /** Convention: starts with a lowercase letter. */
       readonly expected: string;
       readonly message?: undefined;
+      readonly expectedNames?: undefined;
       readonly errorIsInOtherModule?: undefined;
     };
 
