@@ -91,7 +91,7 @@ export type SkirError =
       /** Convention: starts with a lowercase letter. */
       readonly expected: string;
       readonly message?: undefined;
-      readonly expectedNames?: undefined;
+      readonly expectedNames?: readonly string[];
       readonly errorIsInOtherModule?: undefined;
     };
 
