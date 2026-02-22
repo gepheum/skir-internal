@@ -83,7 +83,10 @@ export type SkirError =
       readonly message: string;
       readonly expected?: undefined;
       /** If set, the compiler was expecting one of these names. */
-      readonly expectedNames?: ReadonlyArray<{ name: string; doc: Doc }>;
+      readonly expectedNames?: ReadonlyArray<{
+        readonly name: string;
+        readonly doc?: Doc;
+      }>;
       readonly errorIsInOtherModule?: true;
     }
   | {
@@ -91,7 +94,10 @@ export type SkirError =
       /** Convention: starts with a lowercase letter. */
       readonly expected: string;
       readonly message?: undefined;
-      readonly expectedNames?: ReadonlyArray<{ name: string; doc: Doc }>;
+      readonly expectedNames?: ReadonlyArray<{
+        readonly name: string;
+        readonly doc?: Doc;
+      }>;
       readonly errorIsInOtherModule?: undefined;
     };
 
