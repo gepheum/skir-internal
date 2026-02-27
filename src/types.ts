@@ -269,6 +269,11 @@ export interface MutableField<Mutable extends boolean = true> {
   readonly doc: Doc<Mutable>;
   /** May only be undefined if the field is a constant in an enum. */
   readonly unresolvedType: UnresolvedType | undefined;
+  /**
+   * Set if the type of the field/variant is a record declared inline:
+   *   bar: struct Bar { ... };
+   */
+  readonly inlineRecord: Record<Mutable> | undefined;
   /** May only be undefined if the field is a constant in an enum. */
   type: ResolvedType<Mutable> | undefined;
   /**
@@ -288,11 +293,6 @@ export interface MutableField<Mutable extends boolean = true> {
    *   enum I { h: H; }         // "soft"
    */
   isRecursive: false | "soft" | "hard";
-  /**
-   * Set if the type of the field/variant is a record declared inline:
-   *   bar: struct Bar { ... };
-   */
-  inlineRecord: Record<Mutable> | undefined;
 }
 
 /**
@@ -387,18 +387,26 @@ export interface MutableMethod<Mutable extends boolean = true> {
   readonly name: Token;
   readonly doc: Doc<Mutable>;
   readonly unresolvedRequestType: UnresolvedType;
-  readonly unresolvedResponseType: UnresolvedType;
+  readonly inlineRequestRecord: Record<Mutable> | undefined;
   requestType: ResolvedType<Mutable> | undefined;
+  readonly unresolvedResponseType: UnresolvedType;
+  readonly inlineResponseRecord: Record<Mutable> | undefined;
   responseType: ResolvedType<Mutable> | undefined;
   // A hash of the name, or the explicit number specified after "=" if any.
   // In the uint32 range.
   readonly number: number;
-  inlineRequestRecord: Record<Mutable> | undefined;
-  inlineResponseRecord: Record<Mutable> | undefined;
 }
 
 export type Method<Mutable extends boolean = boolean> = //
   Mutable extends true ? MutableMethod : Readonly<MutableMethod<false>>;
+
+export interface BrokenMethod {
+  readonly kind: "broken-method";
+  readonly unresolvedRequestType: UnresolvedType;
+  readonly inlineRequestRecord: MutableRecord | undefined;
+  readonly unresolvedResponseType: UnresolvedType | undefined;
+  readonly inlineResponseRecord: MutableRecord | undefined;
+}
 
 /** A `const` declaration. */
 export interface MutableConstant<Mutable extends boolean = true> {
@@ -415,6 +423,11 @@ export type Constant<Mutable extends boolean = boolean> = //
   Mutable extends true //
     ? MutableConstant //
     : Readonly<MutableConstant<false>>;
+
+export interface BrokenConstant {
+  readonly kind: "broken-constant";
+  readonly unresolvedType: UnresolvedType;
+}
 
 /** A name:value entry of an object. */
 export interface MutableObjectEntry<Mutable extends boolean = true> {
@@ -437,6 +450,8 @@ export interface MutableObjectValue<Mutable extends boolean = true> {
   readonly kind: "object";
   readonly token: Token;
   readonly entries: Readonly<{ [f: string]: ObjectEntry<Mutable> }>;
+  /** Broken entries containing a name only. */
+  readonly orphanNames: ReadonlyArray<Token>;
   readonly partial: boolean;
   record?: Record;
 }
@@ -606,8 +621,14 @@ export interface Module<Mutable extends boolean = boolean> {
     : readonly RecordLocation[];
 
   readonly methods: ReadonlyArray<Method<Mutable>>;
+  readonly brokenMethods: Mutable extends true
+    ? ReadonlyArray<BrokenMethod>
+    : unknown;
 
   readonly constants: ReadonlyArray<Constant<Mutable>>;
+  readonly brokenConstants: Mutable extends true
+    ? ReadonlyArray<BrokenConstant>
+    : unknown;
 }
 
 /** Can be assigned to a `Module`. */
