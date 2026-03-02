@@ -314,7 +314,7 @@ export type Field<Mutable extends boolean = false> = //
 /** A 'removed' declaration in a struct or enum. */
 export interface Removed {
   readonly kind: "removed";
-  /** The 'removed' keyword token. */
+  /** The 'removed' keyword. */
   readonly removedToken: Token;
   readonly numbers: readonly number[];
 }
@@ -367,9 +367,12 @@ export type MutableRecord = Record<true>;
 
 export interface MutableImport {
   readonly kind: "import";
+  /** The 'import' keyword. */
+  readonly importToken: Token;
   readonly importedNames: Token[];
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
+  /** Range spanning the whole declaration. */
   readonly range: Range;
   resolvedModulePath?: string;
 }
@@ -380,10 +383,13 @@ export type Import<Mutable extends boolean = false> = Mutable extends true
 
 export interface MutableImportAlias {
   readonly kind: "import-alias";
+  /** The 'import' keyword. */
+  readonly importToken: Token;
   /** The alias. */
   readonly name: Token;
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
+  /** Range spanning the whole declaration. */
   readonly range: Range;
   resolvedModulePath?: string;
 }
