@@ -71,6 +71,13 @@ export type Casing =
   | "UpperCamel"
   | "UPPER_UNDERSCORE";
 
+export interface Range {
+  /** Measured in number of characters from the start of the module. */
+  readonly start: number;
+  /** Measured in number of characters from the start of the module. */
+  readonly end: number;
+}
+
 // -----------------------------------------------------------------------------
 // ERROR HANDLING
 // -----------------------------------------------------------------------------
@@ -205,14 +212,14 @@ export interface MutableFieldPath<Mutable extends boolean = true> {
   keyType: PrimitiveType | ResolvedRecordRef;
 }
 
-export type FieldPath<Mutable extends boolean = boolean> = //
+export type FieldPath<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableFieldPath
     : Readonly<MutableFieldPath<false>>;
 
 export interface ArrayType<
   Type = ResolvedType,
-  Mutable extends boolean = boolean,
+  Mutable extends boolean = false,
 > {
   readonly kind: "array";
   readonly item: Type;
@@ -248,7 +255,7 @@ export type UnresolvedType =
  * When Mutable is true, the optional field path of an array type can be
  * modified.
  */
-export type ResolvedType<Mutable extends boolean = boolean> =
+export type ResolvedType<Mutable extends boolean = false> =
   | PrimitiveType
   | ResolvedRecordRef
   | ArrayType<ResolvedType, Mutable>
@@ -301,7 +308,7 @@ export interface MutableField<Mutable extends boolean = true> {
  * structure, so they are represented using the same interface and we use the
  * name 'field' for simplicity.
  */
-export type Field<Mutable extends boolean = boolean> = //
+export type Field<Mutable extends boolean = false> = //
   Mutable extends true ? MutableField : Readonly<MutableField<false>>;
 
 /** A 'removed' declaration in a struct or enum. */
@@ -313,15 +320,15 @@ export interface Removed {
 }
 
 /** A declaration within a record. */
-export type RecordLevelDeclaration<Mutable extends boolean = boolean> =
-  | Field
+export type RecordLevelDeclaration<Mutable extends boolean = false> =
+  | Field<Mutable>
   | Removed
   | Record<Mutable>;
 
 export type MutableRecordLevelDeclaration = RecordLevelDeclaration<true>;
 
 /** Definition of a struct or enum type. */
-export interface Record<Mutable extends boolean = boolean> {
+export interface Record<Mutable extends boolean = false> {
   readonly kind: "record";
   /** Uniquely identifies the record within the module set. */
   readonly key: RecordKey;
@@ -363,10 +370,11 @@ export interface MutableImport {
   readonly importedNames: Token[];
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
+  readonly range: Range;
   resolvedModulePath?: string;
 }
 
-export type Import<Mutable extends boolean = boolean> = Mutable extends true
+export type Import<Mutable extends boolean = false> = Mutable extends true
   ? MutableImport
   : Readonly<MutableImport>;
 
@@ -376,11 +384,13 @@ export interface MutableImportAlias {
   readonly name: Token;
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
+  readonly range: Range;
   resolvedModulePath?: string;
 }
 
-export type ImportAlias<Mutable extends boolean = boolean> =
-  Mutable extends true ? MutableImportAlias : Readonly<MutableImportAlias>;
+export type ImportAlias<Mutable extends boolean = false> = Mutable extends true
+  ? MutableImportAlias
+  : Readonly<MutableImportAlias>;
 
 export interface MutableMethod<Mutable extends boolean = true> {
   readonly kind: "method";
@@ -397,7 +407,7 @@ export interface MutableMethod<Mutable extends boolean = true> {
   readonly number: number;
 }
 
-export type Method<Mutable extends boolean = boolean> = //
+export type Method<Mutable extends boolean = false> = //
   Mutable extends true ? MutableMethod : Readonly<MutableMethod<false>>;
 
 export interface BrokenMethod {
@@ -419,7 +429,7 @@ export interface MutableConstant<Mutable extends boolean = true> {
   valueAsDenseJson: DenseJson | undefined;
 }
 
-export type Constant<Mutable extends boolean = boolean> = //
+export type Constant<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableConstant //
     : Readonly<MutableConstant<false>>;
@@ -440,7 +450,7 @@ export interface MutableObjectEntry<Mutable extends boolean = true> {
   fieldDeclaration?: Field;
 }
 
-export type ObjectEntry<Mutable extends boolean = boolean> = //
+export type ObjectEntry<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableObjectEntry //
     : Readonly<MutableObjectEntry<false>>;
@@ -456,7 +466,7 @@ export interface MutableObjectValue<Mutable extends boolean = true> {
   record?: Record;
 }
 
-export type ObjectValue<Mutable extends boolean = boolean> = //
+export type ObjectValue<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableObjectValue
     : Readonly<MutableObjectValue<false>>;
@@ -469,7 +479,7 @@ export interface MutableArrayValue<Mutable extends boolean = true> {
   key?: FieldPath | undefined;
 }
 
-export type ArrayValue<Mutable extends boolean = boolean> = //
+export type ArrayValue<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableArrayValue //
     : Readonly<MutableArrayValue<false>>;
@@ -481,13 +491,13 @@ export interface MutableLiteralValue {
   type?: PrimitiveType | { kind: "enum"; key: RecordKey } | { kind: "null" };
 }
 
-export type LiteralValue<Mutable extends boolean = boolean> = //
+export type LiteralValue<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableLiteralValue //
     : Readonly<MutableLiteralValue>;
 
 /** The value on the right side of the `=` symbol of a `const` declaration. */
-export type Value<Mutable extends boolean = boolean> =
+export type Value<Mutable extends boolean = false> =
   | ObjectValue<Mutable>
   | ArrayValue<Mutable>
   | LiteralValue<Mutable>;
@@ -501,7 +511,7 @@ export type DenseJson = null | boolean | number | string | readonly DenseJson[];
  * User-written documentation associated with a declaration.
  * Result of parsing the doc comments.
  */
-export interface Doc<Mutable extends boolean = boolean> {
+export interface Doc<Mutable extends boolean = false> {
   /** The whole text including references. */
   text: string;
   /** The whole text split into pieces. */
@@ -510,7 +520,7 @@ export interface Doc<Mutable extends boolean = boolean> {
 
 export type MutableDoc = Doc<true>;
 
-export type DocPiece<Mutable extends boolean = boolean> =
+export type DocPiece<Mutable extends boolean = false> =
   | {
       kind: "text";
       text: string;
@@ -520,7 +530,7 @@ export type DocPiece<Mutable extends boolean = boolean> =
 export type MutableDocPiece = DocPiece<true>;
 
 /** Reference to a field or variant within a record. */
-export interface RecordField<Mutable extends boolean = boolean> {
+export interface RecordField<Mutable extends boolean = false> {
   readonly kind: "field";
   readonly record: Record;
   readonly field: Field<Mutable>;
@@ -543,7 +553,7 @@ export interface MutableDocReference<Mutable extends boolean = true> {
 }
 
 /** Reference to a symbol from a doc comment ( [...] ). */
-export type DocReference<Mutable extends boolean = boolean> = //
+export type DocReference<Mutable extends boolean = false> = //
   Mutable extends true //
     ? MutableDocReference
     : Readonly<MutableDocReference<boolean>>;
@@ -555,13 +565,13 @@ export interface MutableDocReferenceName {
 }
 
 /** One single name found in a reference in a doc comment ( [...] ). */
-export type DocReferenceName<Mutable extends boolean = boolean> =
+export type DocReferenceName<Mutable extends boolean = false> =
   Mutable extends true
     ? MutableDocReferenceName
     : Readonly<MutableDocReferenceName>;
 
 /** A declaration which can appear at the top-level of a module. */
-export type ModuleLevelDeclaration<Mutable extends boolean = boolean> =
+export type ModuleLevelDeclaration<Mutable extends boolean = false> =
   | Record<Mutable>
   | Import<Mutable>
   | ImportAlias<Mutable>
@@ -570,7 +580,7 @@ export type ModuleLevelDeclaration<Mutable extends boolean = boolean> =
 
 export type MutableModuleLevelDeclaration = ModuleLevelDeclaration<true>;
 
-export type Declaration<Mutable extends boolean = boolean> =
+export type Declaration<Mutable extends boolean = false> =
   | RecordLevelDeclaration<Mutable>
   | ModuleLevelDeclaration<Mutable>;
 
@@ -580,7 +590,7 @@ export type MutableDeclaration = Declaration<true>;
  * Contains the definition of a record and information about where the record
  * was defined.
  */
-export interface RecordLocation<Mutable extends boolean = boolean> {
+export interface RecordLocation<Mutable extends boolean = false> {
   readonly kind: "record-location";
   readonly record: Record<Mutable>;
   /**
@@ -598,7 +608,7 @@ export type ImportedNames =
   | { kind: "all"; alias: string }
   | { kind: "some"; names: ReadonlySet<string> };
 
-export interface Module<Mutable extends boolean = boolean> {
+export interface Module<Mutable extends boolean = false> {
   readonly kind: "module";
   readonly path: string;
   readonly sourceCode: string;
@@ -611,6 +621,12 @@ export interface Module<Mutable extends boolean = boolean> {
    * this module.
    */
   readonly pathToImportedNames: { [path: string]: ImportedNames };
+
+  /**
+   * Smallest range including all import declarations.
+   * Null if there is no import declaration.
+   */
+  readonly importBlockRange: Range | null;
 
   /**
    * All the record declared in the module, at the top-level or not.
