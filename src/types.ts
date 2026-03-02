@@ -370,7 +370,7 @@ export interface MutableImport {
   readonly importedNames: Token[];
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
-  readonly range: Range | null;
+  readonly range: Range;
   resolvedModulePath?: string;
 }
 
@@ -384,7 +384,7 @@ export interface MutableImportAlias {
   readonly name: Token;
   /** The token corresponding to the quoted string. */
   readonly modulePath: Token;
-  readonly range: Range | null;
+  readonly range: Range;
   resolvedModulePath?: string;
 }
 
