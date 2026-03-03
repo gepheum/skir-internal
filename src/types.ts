@@ -631,9 +631,7 @@ export interface Module<Mutable extends boolean = boolean> {
    * Maps the path (to another module) to the corresponding import declarations in
    * this module.
    */
-  readonly pathToImportedNames: Mutable extends true
-    ? PathToImportedNames
-    : Readonly<PathToImportedNames>;
+  readonly pathToImportedNames: Readonly<PathToImportedNames>;
 
   /**
    * Smallest range including all import declarations.
