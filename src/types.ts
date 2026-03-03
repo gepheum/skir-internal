@@ -137,8 +137,8 @@ export type Primitive =
   | "bytes";
 
 export interface PrimitiveType {
-  kind: "primitive";
-  primitive: Primitive;
+  readonly kind: "primitive";
+  readonly primitive: Primitive;
 }
 
 /**
@@ -339,7 +339,9 @@ export interface Record<Mutable extends boolean = boolean> {
    * Maps a field name, variant name or nested record name to the corresponding
    * declaration.
    */
-  readonly nameToDeclaration: { [n: string]: RecordLevelDeclaration<Mutable> };
+  readonly nameToDeclaration: Readonly<{
+    [n: string]: RecordLevelDeclaration<Mutable>;
+  }>;
   readonly declarations: ReadonlyArray<RecordLevelDeclaration<Mutable>>;
   /** Fields of the struct or variants of the enum. */
   readonly fields: ReadonlyArray<Field<Mutable>>;
@@ -610,22 +612,26 @@ export type MutableRecordLocation = RecordLocation<true>;
 
 /** The set of names from one module imported to another module. */
 export type ImportedNames =
-  | { kind: "all"; alias: string }
-  | { kind: "some"; names: ReadonlySet<string> };
+  | { readonly kind: "all"; readonly alias: string }
+  | { readonly kind: "some"; readonly names: ReadonlySet<string> };
+
+export type PathToImportedNames = Readonly<{ [path: string]: ImportedNames }>;
 
 export interface Module<Mutable extends boolean = boolean> {
   readonly kind: "module";
   readonly path: string;
   readonly sourceCode: string;
 
-  readonly nameToDeclaration: { [n: string]: ModuleLevelDeclaration<Mutable> };
+  readonly nameToDeclaration: Readonly<{
+    [n: string]: ModuleLevelDeclaration<Mutable>;
+  }>;
   readonly declarations: ReadonlyArray<ModuleLevelDeclaration<Mutable>>;
 
   /**
    * Maps the path (to another module) to the corresponding import declarations in
    * this module.
    */
-  readonly pathToImportedNames: { [path: string]: ImportedNames };
+  readonly pathToImportedNames: PathToImportedNames;
 
   /**
    * Smallest range including all import declarations.
