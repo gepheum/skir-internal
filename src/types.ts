@@ -615,7 +615,7 @@ export type ImportedNames =
   | { readonly kind: "all"; readonly alias: string }
   | { readonly kind: "some"; readonly names: ReadonlySet<string> };
 
-export type PathToImportedNames = Readonly<{ [path: string]: ImportedNames }>;
+export type PathToImportedNames = { [path: string]: ImportedNames };
 
 export interface Module<Mutable extends boolean = boolean> {
   readonly kind: "module";
@@ -631,7 +631,9 @@ export interface Module<Mutable extends boolean = boolean> {
    * Maps the path (to another module) to the corresponding import declarations in
    * this module.
    */
-  readonly pathToImportedNames: PathToImportedNames;
+  readonly pathToImportedNames: Mutable extends true
+    ? PathToImportedNames
+    : Readonly<PathToImportedNames>;
 
   /**
    * Smallest range including all import declarations.
