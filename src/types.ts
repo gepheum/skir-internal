@@ -495,7 +495,7 @@ export type ArrayValue<Mutable extends boolean = boolean> = //
 export interface MutableLiteralValue {
   readonly kind: "literal";
   readonly token: Token;
-  type?: PrimitiveType | { kind: "enum"; key: RecordKey } | { kind: "null" };
+  type?: PrimitiveType | { kind: "enum"; enum: Record } | { kind: "null" };
 }
 
 export type LiteralValue<Mutable extends boolean = boolean> = //
