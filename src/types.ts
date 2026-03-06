@@ -90,10 +90,7 @@ export type SkirError =
       readonly message: string;
       readonly expected?: undefined;
       /** If set, the compiler was expecting one of these names. */
-      readonly expectedNames?: ReadonlyArray<{
-        readonly name: string;
-        readonly doc?: Doc;
-      }>;
+      readonly expectedNames?: readonly ExpectedName[];
       readonly errorIsInOtherModule?: true;
     }
   | {
@@ -101,15 +98,17 @@ export type SkirError =
       /** Convention: starts with a lowercase letter. */
       readonly expected: string;
       readonly message?: undefined;
-      readonly expectedNames?: ReadonlyArray<{
-        readonly name: string;
-        readonly doc?: Doc;
-      }>;
+      readonly expectedNames?: readonly ExpectedName[];
       readonly errorIsInOtherModule?: undefined;
     };
 
 export interface ErrorSink {
   push(error: SkirError): void;
+}
+
+export interface ExpectedName {
+  readonly name: string;
+  readonly doc?: Doc;
 }
 
 /**
@@ -497,8 +496,8 @@ export interface MutableLiteralValue {
   readonly token: Token;
   type?:
     | PrimitiveType
-    | { kind: "enum"; enum: Record; variant: Field }
-    | { kind: "null" };
+    | { readonly kind: "enum"; readonly enum: Record; readonly variant: Field }
+    | { readonly kind: "null" };
 }
 
 export type LiteralValue<Mutable extends boolean = boolean> = //
