@@ -109,6 +109,8 @@ export interface ErrorSink {
 export interface ExpectedName {
   readonly name: string;
   readonly doc?: Doc;
+  /** Set if the name needs to be imported from another module. */
+  readonly modulePath?: string;
 }
 
 /**
