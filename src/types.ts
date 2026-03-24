@@ -286,21 +286,28 @@ export interface MutableField<Mutable extends boolean = true> {
   type: ResolvedType<Mutable> | undefined;
   /**
    * Evaluates to true if the value type of the field/variant depends on the
-   * record where it is defined. If 'Struct.DEFAULT.field' is or contains
-   * 'Struct.DEFAULT', then the dependency is "hard", otherwise it is "soft".
+   * record where it is defined.
+   * There are 3 levels.
+   *   - If S.DEFAULT is or appears in the value of S.DEFAULT.f, then the
+   *     dependency is "hard".
+   *   - If the type of S.f is T?, T is a struct and S.DEFAULT is or appears in
+   *     T.DEFAULT, then the dependency is "via-optional".
+   *   - Otherwise, the dependency is "soft".
    *
    * Examples:
    *   struct A { s: string; }  // false
    *   struct B { b: B; }       // "hard"
-   *   struct C { c: C?; }      // "soft"
+   *   struct C { c: C?; }      // "via-optional"
    *   struct D { d: [D]; }     // "soft"
    *   struct E { f: F; }       // "hard"
    *   struct F { e: E; }       // "hard"
    *   struct G { b: B; }       // false
    *   struct H { i: I; }       // "soft"
    *   enum I { h: H; }         // "soft"
+   *   struct J { k: K?; }      // "via-optional"
+   *   struct K { j: J; }       // "soft"
    */
-  isRecursive: false | "soft" | "hard";
+  isRecursive: false | "soft" | "via-optional" | "hard";
 }
 
 /**
