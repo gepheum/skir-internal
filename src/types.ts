@@ -120,6 +120,7 @@ export interface ExpectedName {
 export interface Result<T> {
   readonly result: T;
   readonly errors: readonly SkirError[];
+  readonly warnings?: readonly SkirError[];
 }
 
 // -----------------------------------------------------------------------------
