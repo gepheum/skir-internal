@@ -92,6 +92,7 @@ export type SkirError =
       /** If set, the compiler was expecting one of these names. */
       readonly expectedNames?: readonly ExpectedName[];
       readonly errorIsInOtherModule?: true;
+      readonly suggestReformat?: boolean;
     }
   | {
       readonly token: Token;
@@ -100,6 +101,7 @@ export type SkirError =
       readonly message?: undefined;
       readonly expectedNames?: readonly ExpectedName[];
       readonly errorIsInOtherModule?: undefined;
+      readonly suggestReformat?: undefined;
     };
 
 export interface ErrorSink {
