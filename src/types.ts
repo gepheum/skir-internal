@@ -15,6 +15,13 @@ export interface CodeGenerator<Config = unknown> {
   readonly id: string;
   readonly configType: z.ZodType<Config>;
   generateCode(input: CodeGenerator.Input<Config>): CodeGenerator.Output;
+  /**
+   * Describes how code outside the generated modules references the
+   * declarations that `generateCode` emits for the same input and config.
+   * Every symbol must match the generated code exactly. Generators that do not
+   * support companion code omit this method.
+   */
+  symbols?(input: CodeGenerator.Input<Config>): CodeGenerator.SymbolProvider;
 }
 
 export declare namespace CodeGenerator {
@@ -31,6 +38,60 @@ export declare namespace CodeGenerator {
   export interface OutputFile {
     readonly path: string;
     readonly code: string;
+  }
+
+  /**
+   * A reference to one generated declaration, written from a source file
+   * outside the generated module.
+   */
+  export interface Symbol {
+    /**
+     * Code that compiles once `imports` are present, e.g. the Dart reference
+     * `_lib_user.User`. Templates mark where the caller's code goes with
+     * `{value}`.
+     */
+    readonly reference: string;
+    /**
+     * Import statements in the target language's own syntax, e.g.
+     * `import "package:app/skirout/user.dart" as _lib_user;`.
+     */
+    readonly imports: readonly string[];
+  }
+
+  /**
+   * Names the declarations that `generateCode` emits, so that companion code
+   * (RPC adapters, framework bindings, routing tables) can reference them
+   * without copying the generator's naming rules.
+   */
+  export interface SymbolProvider {
+    /** The generated type of a struct or enum. */
+    record(location: RecordLocation): Symbol;
+    /**
+     * The generated method descriptor, as a value expression, e.g. Kotlin
+     * `skirout.service.GetUser`, Rust
+     * `crate::skirout::base::service::get_user_method()`.
+     */
+    method(module: Module, method: Method): Symbol;
+    /**
+     * The pattern or constant that matches one enum variant in an exhaustive
+     * match over the variant kind, e.g. Kotlin `Status.Kind.ERROR_WRAPPER`,
+     * Rust `Status::Error(_)`.
+     */
+    variant(location: RecordLocation, variant: Field): Symbol;
+    /**
+     * The expression that constructs one enum variant. For a wrapper variant,
+     * the reference is a template whose `{value}` stands for the wrapped
+     * value, e.g. Kotlin `Status.ErrorWrapper({value})`.
+     */
+    variantConstructor(location: RecordLocation, variant: Field): Symbol;
+    /**
+     * The expression that reads the value wrapped by one wrapper variant. The
+     * reference is a template whose `{value}` stands for an enum value already
+     * known to hold this variant, e.g. Kotlin
+     * `({value} as Status.ErrorWrapper).value`. In Rust, `{value}` is a
+     * reference to the enum and the expression borrows the wrapped value.
+     */
+    variantValue(location: RecordLocation, variant: Field): Symbol;
   }
 }
 
